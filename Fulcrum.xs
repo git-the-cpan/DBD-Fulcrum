@@ -3,15 +3,15 @@
   Project	: DBD::Fulcrum
   Module/Library:
   Author	: $Author: root $
-  Revision	: $Revision: 1.1 $
-  Check-in date	: $Date: 1997/06/18 13:53:46 $
+  Revision	: $Revision: 1.2 $
+  Check-in date	: $Date: 1997/07/06 12:33:26 $
   Locked by	: $Locker:  $
 
   Description	: 
 
 */
 
-static char rcsid[]="$Id: Fulcrum.xs,v 1.1 1997/06/18 13:53:46 root Exp $ (c) 1996, Inferentia S.r.l. (Milano) IT";
+static char rcsid[]="$Id: Fulcrum.xs,v 1.2 1997/07/06 12:33:26 root Exp $ (c) 1996, Inferentia S.r.l. (Milano) IT";
 
 #include "Fulcrum.h"
 
@@ -23,6 +23,7 @@ DBISTATE_DECLARE;
 
 
 MODULE = DBD::Fulcrum	PACKAGE = DBD::Fulcrum
+PROTOTYPES:DISABLE
 
 BOOT:
     items = 0;	/* avoid 'unused variable' warning */

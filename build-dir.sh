@@ -1,4 +1,5 @@
 #!/bin/ksh
+# build-dir.sh $Revision: 1.1 $
 # This is not related to DBD::Fulcrum.
 # It creates an usable directory for Fulcrum tables, by copying needed files
 # from fulcrum home.
@@ -12,4 +13,14 @@ then
 	cp $1/fultext/ftpdf.ini $2
 fi
 cp $1/fultext/*mess $2
+
+FULCREATE=$2
+FULSEARCH=$2
+FULTEMP=$2
+
+export FULCREATE FULSEARCH FULTEMP
+
+$1/bin/execsql -0test.fte -1build-dir.log -2build-dir.log
+
+
 

@@ -46,12 +46,11 @@ print "Using Fulcrum in $FULCRUM\n";
 my $OCIINCLUDE = $::MK{INCLUDE} || "-I$FULCRUM/include";
 
 
-$opts{INC}  = "$OCIINCLUDE -I$Config{sitearch}/DBI";
 
 
 # Would this be the default? We'll se with Solaris (next in line)
 my $sysliblist ="-L$FULCRUM/lib -lftft -lftet -lm";
-$::opts{INC}  = "$OCIINCLUDE -I$Config{sitearch}/DBI";
+$::opts{INC}  = "$OCIINCLUDE -I\$(INSTALLSITEARCH)/auto/DBI";
 # type of linking and libs (begin)
 if ($::Config{osname} eq 'dec_osf') {
     print "Warning: forced to build static not dynamic on $Config{osname} $Config{osver}\n";

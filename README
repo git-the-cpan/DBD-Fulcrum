@@ -13,8 +13,8 @@ DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
     Build, test and install Perl 5 (at least 5.003, this version developed on 5.004)
     It is very important to TEST it and INSTALL it!
 
-    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 0.81).
-    Tested and working with DBI 0.83, but the data_sources method is not implemented (yet).
+    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 0.85).
+    Tested and working with DBI 0.85, but the data_sources method is not implemented (yet).
     It is very important to TEST it and INSTALL it!
 
     Remember to *read* the DBI README file!
@@ -49,6 +49,15 @@ Create the table test using the script test.fte:
    	execsql -0 test.fte
 
 If execsql is not found, try $FULCRUM_HOME/bin/execsql.
+
+Starting with version 0.11, this distribution provides an handy build-dir.sh script. Fed with
+$FULCRUM_HOME and the test directory name as parameters on command line, it will create the directory,
+initialize it with Fulcrum files, and build the test table. 
+	./build-dir.sh $FULCRUM_HOME fultest
+is as good an example as any (and you'll have to set FULCRUM_HOME before, too, so it might be considered
+actually healthy).
+Output of the script goes to build-dir.log for later perusal.
+
 
 	make test
 

@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 # Test script for DBD::Fulcrum
-# $Revision: 1.2 $
+# $Revision: 1.5 $
 
 use Carp;
 
@@ -49,11 +49,11 @@ print "In order to execute the following tests, you MUST have created a table fo
 print "If you haven't already, answer N here and then follow the instructions: ";
 $char = getc(STDIN);
 if (lc($char) eq 'n') {
-   print "\tSet FULCREATE, FULSEARCH and FULTEMP to appropriate values, then\n";
-   print "\tcreate the table test using the script test.fte:\n";
-   print "\texecsql -0 test.fte\n";
-   print "\tHint: if you are creating a brand-new directory for this, remember\n";
-   print "\tto copy over fultext.ftc, fultext.eft, ftpdf.ini (only 3.5) and \*mess files from $ENV{'FULCRUM_HOME'}/fultext\n";
+   print "\tLaunch the build-dir.sh script to build the test directory:\n";
+   print "\t\t./build-dir.sh \$FULCRUM_HOME test-directory\n";
+   print "\tfor instance: ./build-dir.sh \$FULCRUM_HOME fultest\n";
+   print "\tDo NOT use a production directory since it will be initialized!\n";
+   print "\tOutput of the build-dir.sh script will go to build-dir.log\n";
    print "Testing aborted.\n";
    exit 0;
 }

@@ -3,11 +3,11 @@
   Project	: DBD::Fulcrum
   Module/Library:
   Author	: $Author: root $
-  Revision	: $Revision: 1.3 $
-  Check-in date	: $Date: 1997/05/19 07:52:39 $
+  Revision	: $Revision: 1.1 $
+  Check-in date	: $Date: 1997/06/18 13:53:48 $
   Locked by	: $Locker:  $
 
-  RCS-id: $Id: Fulcrum.h,v 1.3 1997/05/19 07:52:39 root Exp $ (c) 1996, Inferentia S.r.l. (Milano) IT
+  RCS-id: $Id: Fulcrum.h,v 1.1 1997/06/18 13:53:48 root Exp $ (c) 1996, Inferentia S.r.l. (Milano) IT
 
   Description	: 
 

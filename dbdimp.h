@@ -2,12 +2,12 @@
 
   Project	: DBD::Fulcrum
   Module/Library:
-  Author	: $Author: shari $
-  Revision	: $Revision: 1.2 $
-  Check-in date	: $Date: 1996/06/20 08:30:20 $
+  Author	: $Author: root $
+  Revision	: $Revision: 1.1 $
+  Check-in date	: $Date: 1997/06/18 13:53:48 $
   Locked by	: $Locker:  $
 
-  RCS-id: $Id: dbdimp.h,v 1.2 1996/06/20 08:30:20 shari Exp $ (c) 1996, Inferentia S.r.l. (Milano) IT
+  RCS-id: $Id: dbdimp.h,v 1.1 1997/06/18 13:53:48 root Exp $ (c) 1996, Inferentia S.r.l. (Milano) IT
 
   Description	: 
 

@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 # Test script for DBD::Fulcrum
-# $Revision: 1.4 $
+# $Revision: 1.2 $
 
 use Carp;
 
@@ -11,8 +11,8 @@ BEGIN {
       $ENV{'FULCRUM_HOME'} = "/home/fulcrum";
       warn "FULCRUM_HOME set to /home/fulcrum!";
    }
-   $ENV{'FULSEARCH'} = "./fultest";
-   $ENV{'FULTEMP'} = "./fultest";
+   $ENV{'FULSEARCH'} = "./fultest" if (!defined($ENV{FULSEARCH}));
+   $ENV{'FULTEMP'} = "./fultest" if (!defined($ENV{FULTEMP}));
 }
 
 

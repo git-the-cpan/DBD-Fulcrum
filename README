@@ -14,11 +14,12 @@ DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
     It is very important to TEST it and INSTALL it!
 
     Build, test and install the DBI module (at least DBI 0.71 - this version developed with 0.81).
+    Tested and working with DBI 0.83, but the data_sources method is not implemented (yet).
     It is very important to TEST it and INSTALL it!
 
     Remember to *read* the DBI README file!
 
-    Install enough Fulcrum SearchServer software to enable DBD::Oracle to build.
+    Install enough Fulcrum SearchServer software to enable DBD::Fulcrum to build.
     That includes the C Software Development Kit.
     Contact Fulcrum (http://www.fulcrum.com) for any information about their products.
 

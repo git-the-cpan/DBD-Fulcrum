@@ -21,7 +21,11 @@ $opt_g &&= '-g';
 %::opts = (
 	   NAME    => 'DBD::Fulcrum',
 	   VERSION_FROM => 'Fulcrum.pm',
-	   OPTIMIZE => $::opt_g
+	   OPTIMIZE => $::opt_g,
+	   dist => {
+		   COMPRESS => 'gzip',
+		   SUFFIX => '.gz'
+		   }
 	   );
 
 # --- Introduction
@@ -92,12 +96,6 @@ WriteMakefile(%opts);
 exit 0;
 
 
-sub MY::post_initialize{
-'
-default_target: all
-';
-}
-
 sub ask {
     my($prompt, $default) = @_;
 	printflush(STDOUT,"$prompt: ");
@@ -106,40 +104,3 @@ sub ask {
 	chomp $value;
 	return $value or $default;
 }
-
-
-# ---------------------------------------------------------------
-
-
-sub MY::dist {		# new name with 5.001e
-    '
-DISTFILES=RCS/*
-
-ci:
-	-ci -u $(DISTFILES) 2>&1 | grep -v "no lock set by "
-	-rcs -q -Nv`echo "$(VERSION)" | tr . _`: $(DISTFILES)
-
-rcsdiff:
-	for f in $(DISTFILES); do rcsdiff -r$(V) $$f; done 2>&1 | less
-
-dist:  ci clean
-	rcs -q -sRel $(DISTFILES)
-	co -q -u     $(DISTFILES)
-	rm -f Makefile *~ t/*~
-	cd ..; tar cvFf $(DISTNAME)-$(VERSION).tar \
-		`sed -e "s:^:$(BASEEXT)/:" < $(BASEEXT)/MANIFEST`
-	cd ..; compress $(DISTNAME)-$(VERSION).tar;
-	@chmod -w ../$(DISTNAME)-$(VERSION).tar.Z
-	mv ../$(DISTNAME)-$(VERSION).tar.Z /u/ftp/pub/perl/db/DBD/Fulcrum/
-	@cp README /u/ftp/pub/perl/db/DBD/Fulcrum/
-	@cd /u/ftp/pub/perl/db/DBD/Fulcrum; pwd; ls -l *.Z
-';
-}
-
-*{"MY::distclean"} = \&MY::dist;	# remain compatible with 5.001
-
-__END__
-
-
-
-

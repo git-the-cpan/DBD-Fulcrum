@@ -3,15 +3,15 @@
   Project	: DBD::Fulcrum
   Module/Library: 
   Author	: $Author: root $
-  Revision	: $Revision: 1.6 $
-  Check-in date	: $Date: 1997/05/19 07:48:57 $
+  Revision	: $Revision: 1.1 $
+  Check-in date	: $Date: 1997/06/18 13:53:50 $
   Locked by	: $Locker:  $
 
   Description	: 
 
 */
 
-static char rcsid[]="$Id: dbdimp.c,v 1.6 1997/05/19 07:48:57 root Exp $ (c) 1996, Inferentia S.p.A. (Milano) IT";
+static char rcsid[]="$Id: dbdimp.c,v 1.1 1997/06/18 13:53:50 root Exp $ (c) 1996, Inferentia S.p.A. (Milano) IT";
 #include <stdio.h>
 #include "Fulcrum.h"
 

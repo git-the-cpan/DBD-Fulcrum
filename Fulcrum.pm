@@ -2,17 +2,17 @@
 #	Project		: DBD::Fulcrum
 #	Module/Library	: 
 #	Author		: $Author: shari $
-#	Revision	: $Revision: 2.7 $
-#	Check-in date	: $Date: 1998/11/11 16:48:17 $
+#	Revision	: $Revision: 2.15 $
+#	Check-in date	: $Date: 1998/12/16 14:46:33 $
 #	Locked by	: $Locker:  $
 #
 #	----------------
 #	Copyright	:
-#	$Id: Fulcrum.pm,v 2.7 1998/11/11 16:48:17 shari Exp $ (c) 1996-98, Davide Migliavacca and Inferentia (Milano) IT
+#	$Id: Fulcrum.pm,v 2.15 1998/12/16 14:46:33 shari Exp $ (c) 1996-98, Davide Migliavacca and Inferentia (Milano) IT
 #	
 #	Description	:
 
-$DBD::Fulcrum::VERSION = '0.19';
+$DBD::Fulcrum::VERSION = '0.20';
 
 
 {
@@ -23,7 +23,7 @@ $DBD::Fulcrum::VERSION = '0.19';
     use Exporter ();
     @ISA = qw(Exporter DynaLoader);
 	
-    my $Revision = substr(q$Revision: 2.7 $, 10);
+    my $Revision = substr(q$Revision: 2.15 $, 10);
     require_version DBI 1.00 ;
 
     bootstrap DBD::Fulcrum $VERSION;
@@ -120,6 +120,20 @@ $DBD::Fulcrum::VERSION = '0.19';
 
 	$sth;
     }
+    
+    sub table_info {
+       my($dbh) = @_;		# XXX add qualification
+       my $sth = $dbh->prepare("select
+		TABLE_QUALIFIER,
+		TABLE_OWNER,
+		TABLE_NAME,
+		TABLE_TYPE,
+		REMARKS
+	    from TABLES
+	    order by TABLE_TYPE, TABLE_OWNER, TABLE_NAME") or return undef;
+       $sth->execute or return undef;
+       $sth;
+    }
 
 }
 
@@ -179,8 +193,8 @@ Please consult Fulcrum docs for more information or refer to test.pl for real-wo
 
 =head1 CAVEATS AND NOTES
 
-=head2 General
-This driver implements basic functionality ONLY.
+This driver implements basic functionality and a couple of driver-specific attributes.
+Starting with 0.20, DBI::Shell is (partially) supported.
 
 =head2 DBD::Fulcrum::ful_maxhitsinternalcolumns (driver-specific attribute)
 This attribute modifies allocation of result values buffers. It is driver-wide and is checked when an actual allocation is made. So, use it as soon as possible and try to use it throughout an application.
@@ -195,6 +209,9 @@ If not after INSERT, UPDATE or DELETE the value of this attribute is unspecified
 Code contributed by Loic Dachary (see acknoledgments section).
 Note that to use this attribute you must use prepare/execute instead of "do" since only
 prepare will return a $sth, and only execute will initialize the attribute.
+
+=head2 $sth->{CursorName} (DBI-standard read-only attribute)
+This driver supports the CursorName attribute via SQLGetCursorName.
 
 =head2 Please be patient
 I have not a lot of time to dedicate to this driver nowadays. If you find a problem, and even better its solution, I will be very grateful if you let me know.
@@ -216,10 +233,11 @@ Since I'm not a MakeMaker geek, you'll need to follow this ugly hack:
 	1) perl Makefile.PL
 	2) hand-edit Makefile.aperl
 	3) change MAP_LINKCMD and change it to read $(CC) -taso plus whatever was there.
-	4) make -f Makefile.aperl
-(More or less).
+	4) make CB<-f> Makefile.aperl
+(More or less). If you have a suggestion on how to streamline this with MakeMaker, please
+let me know!
 You'll get "unaligned access" console warnings due to 32-bitness of Fulcrum libraries.
-Suppress the warnings, there's no other way to deal with this.
+Suppress the warnings using "uac", there's no other way to deal with this (that I know of).
 
 =head2 Windows NT
 Starting with version 0.12 you should be able to build under Microsoft(tm) Windows(tm) NT(tm).
@@ -248,7 +266,8 @@ Now you should be able to perl Makefile.PL, nmake and nmake install. At least it
 
 =head1 COLLATERALS
 
-Fulcrum SearchServer: http://www.fulcrum.com
+Fulcrum SearchServer: http://www.pcdocs.com
+
 
 =head1 SEE ALSO
 
@@ -266,6 +285,7 @@ Roberto Bianchettin <robertob@pisa.iol.it>, Juha Makinen, Peter Wyngaard for tes
 unstable releases and finding problems (and solutions!)
 Loic Dachary <loic@ceic.com> for adding support for retrienving FT_CID values
 after insert, update or delete.
+Peter Wyngaard <peterw@anecdote.com> for adding support to the CursorName attribute.
 Ted Lemon, for continuing support to the dbi mailing lists.
 
 

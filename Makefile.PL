@@ -1,4 +1,5 @@
 #!/usr/local/bin/perl -sw
+# $Id: Makefile.PL,v 1.13 1998/12/16 15:14:59 shari Exp $
 
 use ExtUtils::MakeMaker;
 use FileHandle;
@@ -31,8 +32,11 @@ $opt_g &&= '-g';
 
 # --- Introduction
 
-print "\nConfiguring DBD::Fulcrum...\n";
-print "Please, READ the docs before installing!\n\n";
+# print "\nConfiguring DBD::Fulcrum $self->{VERSION}...\n";
+print "---\> Please, READ the docs before installing!\n\n";
+print "Whoa! FULCRUM_HOME is not set. READ THE DOCS!\n\n" if (!$ENV{FULCRUM_HOME});
+#print "Whoa! FULSEARCH is not set. READ THE DOCS!\n\n" if (!$ENV{FULSEARCH});
+#print "Whoa! FULTEMP is not set. While not mandatory, it is very likely make test will fail. In which case, set it and re-run make test.\n\n" if (!$ENV{FULTEMP});
 
 # --- Where is Fulcrum SearchServer installed...
 
@@ -55,7 +59,7 @@ $::opts{INC}  = "$OCIINCLUDE -I\$(INSTALLSITEARCH)/auto/DBI";
 # type of linking and libs (begin)
 if ($::Config{osname} eq 'dec_osf') {
     print "Warning: forced to build static not dynamic on $Config{osname} $Config{osver}\n";
-    print "Warning: You need to hand-edit Makefile.aperl and change MAP_LINKCMD to read = $CC -taso ...\n";
+    print "Warning: You need to hand-edit Makefile.aperl and change MAP_LINKCMD to read = \$CC -taso ...\n";
     print "         See README and Makefile.PL for more information.\n";
     $opts{LINKTYPE} = 'static';
     $opts{DEFINE} = '-taso';
@@ -106,5 +110,21 @@ sub ask {
 }
 
 sub MY::postamble {
-	return dbd_postamble(@_);
+   return dbd_postamble(@_);
 }
+
+
+
+{
+   package MY;
+
+   sub post_initialize {
+      my $self = shift;
+      print "\nConfiguring DBD::Fulcrum $self->{VERSION}...\n";
+
+      return '';
+   }
+   
+}
+
+__END__

@@ -3,11 +3,20 @@
   Project	: DBD::Fulcrum
   Module/Library: 
   Author	: $Author: shari $
-  Revision	: $Revision: 2.9 $
-  Check-in date	: $Date: 1998/11/11 16:48:36 $
+  Revision	: $Revision: 2.12 $
+  Check-in date	: $Date: 1998/12/04 09:57:18 $
   Locked by	: $Locker:  $
 
   $Log: dbdimp.c,v $
+  Revision 2.12  1998/12/04 09:57:18  shari
+  0.19_03: now honors $sth->{CursorName}. NUM_OF_PARAMS unhandled, DBI takes care of it.
+
+  Revision 2.11  1998/11/24 16:14:54  shari
+  Now honors AutoCommit and table_info (for DBI::Shell)
+
+  Revision 2.10  1998/11/23 14:00:21  shari
+  Renamed Num_of_params to NUM_OF_PARAMS.
+
   Revision 2.9  1998/11/11 16:48:36  shari
   Multiple connects; release 0.19
 
@@ -17,7 +26,7 @@
 
 */
 
-static char rcsid[]="$Id: dbdimp.c,v 2.9 1998/11/11 16:48:36 shari Exp $ (c) 1996, Inferentia S.p.A. (Milano) IT";
+static char rcsid[]="$Id: dbdimp.c,v 2.12 1998/12/04 09:57:18 shari Exp $ (c) 1996-98, Davide Migliavacca & Inferentia (Milano) IT";
 #include <stdio.h>
 #include "Fulcrum.h"
 
@@ -380,13 +389,12 @@ dbd_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
   char *msg;
   
   if (kl==10 && strEQ(key, "AutoCommit")) {
-    if ( on  ) {
-      /* do nothing, not supported by SearchServer */
-      ;
+    /* do nothing, not supported by SearchServer,
+       BUT honor correct behaviour */
+    if (on) {
+      DBIc_set(imp_dbh,DBIcf_AutoCommit, on);
     }
-    else {
-      cachesv = (on) ? &sv_yes : &sv_no;	/* cache new state */
-    }
+    cachesv = &sv_yes;	/* cache new state */
   } else {
     return FALSE;
   }
@@ -404,14 +412,21 @@ dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
   SV *retsv = NULL;
   /* Default to caching results for DBI dispatch quick_FETCH	*/
   int cacheit = TRUE;
-  
-  if (1) {		/* no attribs defined yet	*/
-    return Nullsv;
+
+  if (kl==10 && strEQ(key, "AutoCommit")) {
+    retsv = boolSV(DBIc_has(imp_dbh,DBIcf_AutoCommit));
   }
+  if (!retsv)
+    return Nullsv;
+
   if (cacheit) {	/* cache for next time (via DBI quick_FETCH)	*/
-    hv_store((HV*)SvRV(dbh), key, kl, retsv, 0);
+    SV **svp = hv_fetch((HV*)SvRV(dbh), key, kl, 1);
+    sv_free(*svp);
+    *svp = retsv;
     (void)SvREFCNT_inc(retsv);	/* so sv_2mortal won't free it	*/
   }
+  if (retsv == &sv_yes || retsv == &sv_no)
+    return retsv; /* no need to mortalize yes or no */
   return sv_2mortal(retsv);
 }
 
@@ -1017,40 +1032,52 @@ dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
   SV *retsv = NULL;
   /* Default to caching results for DBI dispatch quick_FETCH	*/
   int cacheit = TRUE;
+
+  if (kl==13 && strEQ(key, "NUM_OF_PARAMS")) {
+    return Nullsv;	/* handled by DBI */
+  } 
   
   if (!imp_sth->done_desc && !dbd_describe(sth, imp_sth)) {
     /* dbd_describe has already called ora_error()		*/
     return Nullsv;	/* XXX not quite the right thing to do?	*/
   }
+
   
   i = DBIc_NUM_FIELDS(imp_sth);
   
-  if (kl==7 && strEQ(key, "lengths")) {
+  if (kl == 7 && strEQ(key, "lengths")) {
     AV *av = newAV();
     retsv = newRV((SV*)av);
     while(--i >= 0)
       av_store(av, i, newSViv((IV)imp_sth->fbh[i].dsize));
-  } else if (kl==5 && strEQ(key, "types")) {
+  } else if (kl == 5 && strEQ(key, "types")) {
     AV *av = newAV();
     retsv = newRV((SV*)av);
     while(--i >= 0)
       av_store(av, i, newSViv(imp_sth->fbh[i].dbtype));
-    
-  } else if (kl==13 && strEQ(key, "Num_OF_Params")) {
-    HV *bn = imp_sth->bind_names;
-    retsv = newSViv( (bn) ? HvKEYS(bn) : 0 );
-    
-  } else if (kl==15 && strEQ(key, "ful_last_row_id")) {
+  } else if (kl == 15 && strEQ(key, "ful_last_row_id")) {
     /* thanks to Loic Dachary for this... */
     HV *bn = imp_sth->bind_names;
     retsv = newSViv( imp_sth->ful_last_row_id );
-  } else if (kl==4 && strEQ(key, "NAME")) {
+  } else if (kl == 4 && strEQ(key, "NAME")) {
     AV *av = newAV();
     retsv = newRV((SV*)av);
     while(--i >= 0)
       av_store(av, i, newSVpv((char*)imp_sth->fbh[i].cbuf,0));
     
-  } else {
+  } else if (kl == 10 && strEQ(key, "CursorName")) {
+    /* Thanks to Peter Wyngaard for this ... */
+    char cursor_name[SQL_MAX_CURSOR_NAME_LEN + 1];
+    if (SQLGetCursorName (imp_sth->phstmt,
+			  cursor_name,
+			  SQL_MAX_CURSOR_NAME_LEN,
+			  NULL)
+	== SQL_SUCCESS)
+      retsv = newSVpv (cursor_name, 0);
+    else
+      retsv = Nullsv;
+  }
+  else {
     return Nullsv;
   }
 

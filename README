@@ -13,6 +13,19 @@ DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
    In fact, most of the documentation previously found here is now relocated in pod format...
 
 NEWS:
+ Version 0.20: this one.
+
+ Version 0.19_03: released as 0.20
+	Support for CursorName (statement attribute). Contributed by
+	Peter Wyngaard <peterw@anecdote.com>
+
+ Version 0.19_02: Not released.
+	Minor fixes.
+
+ Version 0.19_01: Not released.
+	Minor doc changes. Tested on HP-UX 10.20 after some time.
+	Added $dbh->table_info method for DBI::Shell.
+
  Version 0.19: Released.
 	BE CAREFUL, this version is SUBSTANTIALLY DIFFERENT from the latest
 	released (0.12). Check your seat belts before installing _AND_
@@ -60,7 +73,7 @@ PLATFORMS:
     Build, test and install Perl 5 (at least 5.003, this version developed on 5.005_02)
     It is very important to TEST it and INSTALL it!
 
-    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 01.02).
+    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 1.02).
     It is very important to TEST it and INSTALL it!
     I have built under NT using perl5.004_57, DBI 0.92, and SearchServer 3.5c.
     Read the platform-specific notes using 'perldoc Fulcrum'
@@ -71,7 +84,11 @@ PLATFORMS:
     That includes the C Software Development Kit.
     Set FULCRUM_HOME to the base of your installation. You'll need FULCRUM_HOME
     both for building and for running DBD::Fulcrum.
-    Contact Fulcrum (http://www.fulcrum.com) for any information about their products.
+    This is not required by SearchServer itself, just by this driver!
+    (But it _is_ required).
+    
+    Contact PCDOCS (http://www.pcdocs.com) for any information about their products
+    and Fulcrum SearchServer.
 
 
 BUILDING:
@@ -132,7 +149,7 @@ know so that I can try to make it automatic in a later release.
 
 DBI resources:
 	DBI home page:
-	http://www.hermetica.com/DBI
+	http://www.arcana.co.uk/technologia/perl/DBI
 	dbi mailing lists:
 	http://www.fugue.com/dbi for subscriptions
 
@@ -157,10 +174,11 @@ Davide.
 
 
 ===============================================================================
-DBI 'home page': http://www.hermetica.com/technologia/DBI
+DBI 'home page': http://www.arcana.co.uk/technologia/perl/DBI
 
 Searchable index of the dbi-users mailing list:
-http://www.coe.missouri.edu/~faq/lists/dbiusers/
+-- please consult the DBI home page. Pointers sometimes change, 
+-- those pages will always offer the current URLs 
 
 Fulcrum home page: http://www.fulcrum.com
 Davide's home page: http://ttt.inferentia.it/users/shari

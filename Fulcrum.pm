@@ -1,14 +1,14 @@
 #
 #	Project		: DBD::Fulcrum
 #	Module/Library	: 
-#	Author		: $Author: root $
-#	Revision	: $Revision: 1.2 $
-#	Check-in date	: $Date: 1997/07/06 12:33:14 $
+#	Author		: $Author: shari $
+#	Revision	: $Revision: 1.7 $
+#	Check-in date	: $Date: 1998/02/06 17:30:00 $
 #	Locked by	: $Locker:  $
 #
 #	----------------
 #	Copyright	:
-#	$Id: Fulcrum.pm,v 1.2 1997/07/06 12:33:14 root Exp $ (c) 1996, Inferentia (Milano) IT
+#	$Id: Fulcrum.pm,v 1.7 1998/02/06 17:30:00 shari Exp $ (c) 1996-98, Davide Migliavacca and Inferentia (Milano) IT
 #	
 #	Description	:
 
@@ -24,9 +24,9 @@
 				 $attrib_date $attrib_ts $attrib_dec
 				 $attrib_ts_nullok $attrib_int_nullok $attrib_char_nullok);
     
-    $VERSION = '0.11';
+    $VERSION = '0.12';
     
-    my $revision = substr(q$Revision: 1.2 $, 10);
+    my $revision = substr(q$Revision: 1.7 $, 10);
     require_version DBI 0.81 ;
 
     bootstrap DBD::Fulcrum;

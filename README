@@ -1,12 +1,17 @@
 DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
 
-   Copyright (c) 1996,1997  Davide Migliavacca & INFERENTIA, Milano ITALY
+   Copyright (c) 1996-1998  Davide Migliavacca & INFERENTIA, Milano ITALY
 
    You may distribute under the terms of either the GNU General Public
    License or the Artistic License, as specified in the Perl README file.
+   If you modify this, and are willing to share, please let me know so that
+   I may fold the changes in for the immense benefit of other people.
 
    PLEASE READ THE ENTIRE README FILE CAREFULLY !
 
+NEWS:
+ Version 0.12: Builds and tests fine under Windows NT 4.0sp3, SearchServer 3.5c,
+               DBI 0.92, perl 5.004_57
 
 *BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
 
@@ -14,8 +19,9 @@ DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
     It is very important to TEST it and INSTALL it!
 
     Build, test and install the DBI module (at least DBI 0.71 - this version developed with 0.85).
-    Tested and working with DBI 0.85, but the data_sources method is not implemented (yet).
     It is very important to TEST it and INSTALL it!
+    I have built under NT using perl5.004_57, DBI 0.92, and SearchServer 3.5c.
+    Read the NTNOTES below.
 
     Remember to *read* the DBI README file!
 
@@ -39,7 +45,7 @@ to your new directory (you can use fultest under the DBD-Fulcrum dist,
 that's exactly what it's there for).
 	fultext.ftc
 	fultext.eft
-	ftpdf.ini (only 3.5)
+	ftpdf.ini (sometimes)
 	*mess files 
 
 Set FULCRUM_HOME to your Fulcrum SearchServer installation directory (e.g. /usr/fulcrum).
@@ -71,6 +77,28 @@ It is frequent to have and invalid or unreasonable FULTEMP variable. Usually you
 messages about memory not being enough. Be sure FULTEMP is valid and is readable/writable to whom
 must execute the program using DBD::Fulcrum.
 
+NTNOTES
+Starting with version 0.12 you should be able to build under Microsoft(tm) Windows(tm) NT(tm).
+
+Environment variables have very little usefulness there, BUT you'll need FULCRUM_HOME set because Makefile.PL depends on it.
+Instead of using FULSEARCH, use the first parameter to connect in order to specify the ODBC data source (which roughly define a directory for SearchServer to use).
+test.pl uses the definition of the environment variable DBI_DSN, read on.
+
+So in order to build and test:
+
+*please note* I have successfully built and tested with SearchServer 3.5c under NT 4.0, Microsoft Visual C++ 5.0, perl 5.004_57 (of the development track) and DBI 0.92. I can't imagine what could happen in another situation. And, I most definitely lack the time to test. If you feel like it, try and let me know your configuration, I'll add it to this file.
+
+First of all, have SearchServer installed and running. Test your SearchServer before trying to use DBI, please.
+Declare a new ODBC data source that you'll need to use for the after-build test. Let's name it "testdsn". Notice the FULCREATE, FULSEARCH and FULTEMP values? Instead of using the environment, you define them here.
+Copy to the directory you specified for FULCREATE and FULSEARCH (do yourself a favour and let them be the same), the exactly same files you see in build-dir.sh (THAT will not work, sorry) unless you don't see them in FULCRUM_HOME\fultext (that is, ignore the ftpdf.ini file if it's missing). You'll at mininum need fultext.ftc, and the *mess files.
+Use execsql, select the just declared data source "testdsn", and run the test.fte you find here. This will create the TEST table used by the tests (I'm losing count of tests here :-).
+
+In your worthy Command Prompt, set the environment variable DBI_DSN:
+	set DBI_DSN=testdsn
+
+Rememeber to set FULCRUM_HOME to the base installation directory of the SearchServer C SDK.
+
+Now you should be able to perl Makefile.PL, nmake and nmake install. At least it worked for me.
 
 IF YOU HAVE PROBLEMS:
 
@@ -114,7 +142,7 @@ Searchable index of the dbi-users mailing list:
 http://www.coe.missouri.edu/~faq/lists/dbiusers/
 
 Fulcrum home page: http://www.fulcrum.com
-INFERENTIA home page: http://www.inferentia.it
+Shari's home page: http://ttt.inferentia.it/users/shari
 
 
 ===============================================================================

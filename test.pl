@@ -1,8 +1,9 @@
 #!/usr/local/bin/perl -w
 # Test script for DBD::Fulcrum
-# $Revision: 1.5 $
+# $Revision: 1.6 $
 
 use Carp;
+use Cwd;
 
 
 BEGIN {
@@ -54,6 +55,8 @@ if (lc($char) eq 'n') {
    print "\tfor instance: ./build-dir.sh \$FULCRUM_HOME fultest\n";
    print "\tDo NOT use a production directory since it will be initialized!\n";
    print "\tOutput of the build-dir.sh script will go to build-dir.log\n";
+   print "\t++ Sorry, this will NOT work under NT. Just copy the relevant files yourself,\n";
+   print "\tby lurking in the abovementioned shell script.\n";
    print "Testing aborted.\n";
    exit 0;
 }
@@ -62,7 +65,11 @@ if (lc($char) eq 'n') {
 $::ful_dbh = undef; # global to avoid parameter passing...
 
 print "Connecting to fulcrum (this is a no op)... ";
-if (!($::ful_dbh = $ful_drh->connect ('','',''))) {
+# Note here: Under NT, you have to specify the data source (first parameter)
+# while under Unix, only the FULSEARCH var has a role.
+# So, iff on NT, set DBI_DSN to the data source name (ONLY the data source name, this is directly passed to SS)
+# and else, do not set it.
+if (!($::ful_dbh = $ful_drh->connect ($ENV{DBI_DSN},'',''))) {
     print "Cannot connect to Fulcrum ($DBI::errstr)\n";
     exit 1;
 }
@@ -88,11 +95,12 @@ print "ok\n";
 print "Inserting a document into test table... ";
 
 @statdata = stat ('test.fte');
-my $pwd = `pwd`;
+my $pwd = Cwd::getcwd; # be portable Davide, be portable!
 chomp($pwd);
+$pwd =~ s/\'/\''/g; # if a quote is present in a string, we have to double it in order to escape.
 
 if (!($::ful_dbh->do(
-		     "insert into test(title,filesize,ft_sfname) values ('Test document', $statdata[7], '$pwd/test.fte')"
+		     "insert into test(title,filesize,ft_sfname) values ('Test document', $statdata[7], '" . $pwd . "/test.fte')"
 		    ))) {
     print "FAILED: Cannot insert test.fte ($DBI::errstr)\n";
     exit 1;

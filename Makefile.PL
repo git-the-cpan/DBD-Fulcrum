@@ -13,6 +13,7 @@ $SIG{'__DIE__'}  = sub { Carp::confess $_[0] };
 require 'flush.pl';
 
 use DBI;	# The DBI must be installed before we can build a DBD
+use DBI::DBD;
 
 getopts('g') or die "Invalid arguments";
 
@@ -31,7 +32,7 @@ $opt_g &&= '-g';
 # --- Introduction
 
 print "\nConfiguring DBD::Fulcrum...\n";
-print "Remember to actually read the CAVEATS file!\n\n";
+print "Please, READ the docs before installing!\n\n";
 
 # --- Where is Fulcrum SearchServer installed...
 
@@ -54,7 +55,7 @@ $::opts{INC}  = "$OCIINCLUDE -I\$(INSTALLSITEARCH)/auto/DBI";
 # type of linking and libs (begin)
 if ($::Config{osname} eq 'dec_osf') {
     print "Warning: forced to build static not dynamic on $Config{osname} $Config{osver}\n";
-    print "Warning: You need to hand-edit Makefile.aperl and change MAP_LINKCMD to read = $(CC) -taso ...\n";
+    print "Warning: You need to hand-edit Makefile.aperl and change MAP_LINKCMD to read = $CC -taso ...\n";
     print "         See README and Makefile.PL for more information.\n";
     $opts{LINKTYPE} = 'static';
     $opts{DEFINE} = '-taso';
@@ -102,4 +103,8 @@ sub ask {
     my $value = <>;
 	chomp $value;
 	return $value or $default;
+}
+
+sub MY::postamble {
+	return dbd_postamble(@_);
 }

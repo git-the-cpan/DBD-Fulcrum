@@ -1,6 +1,6 @@
 DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
 
-   Copyright (c) 1996-1998  Davide Migliavacca & INFERENTIA, Milano ITALY
+   Copyright (c) 1996-1998  Davide Migliavacca and Inferentia, Milano ITALY
 
    You may distribute under the terms of either the GNU General Public
    License or the Artistic License, as specified in the Perl README file.
@@ -9,24 +9,68 @@ DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
 
    PLEASE READ THE ENTIRE README FILE CAREFULLY !
 
+   You can now run perldoc Fulcrum to read the docs.
+   In fact, most of the documentation previously found here is now relocated in pod format...
+
 NEWS:
- Version 0.12: Builds and tests fine under Windows NT 4.0sp3, SearchServer 3.5c,
-               DBI 0.92, perl 5.004_57
+ Version 0.19: Released.
+	BE CAREFUL, this version is SUBSTANTIALLY DIFFERENT from the latest
+	released (0.12). Check your seat belts before installing _AND_
+	keep a DBD-Fulcrum-0.12.tar.gz around for sometime.
+	You've been warned.
+	Multiple connects bug fixed with info from Loic Dachary.
+
+ Version 0.18: Not released.
+
+	Added $sth->{ful_last_row_id}, contributed by Loic Dachary
+	<loic@ceic.com>
+	Clean up for test.pl (just a little).
+
+ Version 0.17: prereleased (never on CPAN)
+	final polishing before release.
+
+
+ Version 0.16: mostly rewritten to take advantage of the new DBI
+	'xst' templates.
+	Truncation behaviour is now rationalized.
+	Added DBD::Fulcrum::ful_maxhitsinternalcolumns to allow for
+	larger buffers when data truncated is not desired (see docs)
+
+
+ Version 0.15: minor packaging details. This should be the last version
+	not using Driver.xst.
+
+ Version 0.14: Bug fix WRT allocation of buffers for "normal" fields
+	(not APVARCHAR) where SET SHOW_MATCHES 'TRUE'.
+	Thanks to Roberto Bianchettin <roberto@pisa.iol.it> for finding it.
+
+ Version 0.13: Just README changes, not released.
+
+ Version 0.12: Builds and tests fine under Windows NT 4.0sp3,
+	SearchServer 3.5c, DBI 0.92, perl 5.004_57
+
+ Version 0.01-0.11: History.
+
+PLATFORMS:
+  Known to work on: SearchServer 2.x and beyond (lately tested only on 3.5)
+  on IBM AIX 3.2.5, 4.1.5; Digital OSF/1 3.2c, Digital Unix 4.0c, Solaris 2.5.1/2.6 Sparc, Solaris 2.4 (reported from user), Windows NT 4.0sp3, HP-UX 10.20-11.00.
 
 *BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
 
-    Build, test and install Perl 5 (at least 5.003, this version developed on 5.004)
+    Build, test and install Perl 5 (at least 5.003, this version developed on 5.005_02)
     It is very important to TEST it and INSTALL it!
 
-    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 0.85).
+    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 01.02).
     It is very important to TEST it and INSTALL it!
     I have built under NT using perl5.004_57, DBI 0.92, and SearchServer 3.5c.
-    Read the NTNOTES below.
+    Read the platform-specific notes using 'perldoc Fulcrum'
 
     Remember to *read* the DBI README file!
 
     Install enough Fulcrum SearchServer software to enable DBD::Fulcrum to build.
     That includes the C Software Development Kit.
+    Set FULCRUM_HOME to the base of your installation. You'll need FULCRUM_HOME
+    both for building and for running DBD::Fulcrum.
     Contact Fulcrum (http://www.fulcrum.com) for any information about their products.
 
 
@@ -77,29 +121,6 @@ It is frequent to have and invalid or unreasonable FULTEMP variable. Usually you
 messages about memory not being enough. Be sure FULTEMP is valid and is readable/writable to whom
 must execute the program using DBD::Fulcrum.
 
-NTNOTES
-Starting with version 0.12 you should be able to build under Microsoft(tm) Windows(tm) NT(tm).
-
-Environment variables have very little usefulness there, BUT you'll need FULCRUM_HOME set because Makefile.PL depends on it.
-Instead of using FULSEARCH, use the first parameter to connect in order to specify the ODBC data source (which roughly define a directory for SearchServer to use).
-test.pl uses the definition of the environment variable DBI_DSN, read on.
-
-So in order to build and test:
-
-*please note* I have successfully built and tested with SearchServer 3.5c under NT 4.0, Microsoft Visual C++ 5.0, perl 5.004_57 (of the development track) and DBI 0.92. I can't imagine what could happen in another situation. And, I most definitely lack the time to test. If you feel like it, try and let me know your configuration, I'll add it to this file.
-
-First of all, have SearchServer installed and running. Test your SearchServer before trying to use DBI, please.
-Declare a new ODBC data source that you'll need to use for the after-build test. Let's name it "testdsn". Notice the FULCREATE, FULSEARCH and FULTEMP values? Instead of using the environment, you define them here.
-Copy to the directory you specified for FULCREATE and FULSEARCH (do yourself a favour and let them be the same), the exactly same files you see in build-dir.sh (THAT will not work, sorry) unless you don't see them in FULCRUM_HOME\fultext (that is, ignore the ftpdf.ini file if it's missing). You'll at mininum need fultext.ftc, and the *mess files.
-Use execsql, select the just declared data source "testdsn", and run the test.fte you find here. This will create the TEST table used by the tests (I'm losing count of tests here :-).
-
-In your worthy Command Prompt, set the environment variable DBI_DSN:
-	set DBI_DSN=testdsn
-
-Rememeber to set FULCRUM_HOME to the base installation directory of the SearchServer C SDK.
-
-Now you should be able to perl Makefile.PL, nmake and nmake install. At least it worked for me.
-
 IF YOU HAVE PROBLEMS:
 
 Do not hand edit the generated Makefile unless you are completely sure
@@ -127,7 +148,7 @@ dbi-users@fugue.com and CC them to me at Davide.Migliavacca@inferentia.it. But n
 	make test
 	make test TEST_VERBOSE=1   (only if any of the t/* tests fail)
 
-2. Full details of which version of FUlcrum SearchServer, Perl and OS you're using.
+2. Full details of which version of Fulcrum SearchServer, Perl and OS you're using.
 
 3. The output of perl -V
 
@@ -142,7 +163,7 @@ Searchable index of the dbi-users mailing list:
 http://www.coe.missouri.edu/~faq/lists/dbiusers/
 
 Fulcrum home page: http://www.fulcrum.com
-Shari's home page: http://ttt.inferentia.it/users/shari
+Davide's home page: http://ttt.inferentia.it/users/shari
 
 
 ===============================================================================

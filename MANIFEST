@@ -8,7 +8,7 @@ dbdimp.c
 dbdimp.h
 fultest/placeholder.txt
 t/base.t
-t/main.t
+t/misc.t
 test.fte
 test.pl
 build-dir.sh

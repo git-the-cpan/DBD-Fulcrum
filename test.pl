@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 # Test script for DBD::Fulcrum
-# $Revision: 1.6 $
+# $Revision: 2.2 $
 
 use Carp;
 use Cwd;
@@ -77,7 +77,8 @@ if (!($::ful_dbh = $ful_drh->connect ($ENV{DBI_DSN},'',''))) {
 print "ok.\n";
 
 print "Setting SHOW_MATCHES to EXTERNAL_COLUMN... ";
-if (!($::ful_dbh->do( "set show_matches 'EXTERNAL_COLUMN'"))) {
+if (!($::ful_dbh->do( "set show_matches 'INTERNAL_COLUMNS'"))) {
+#   if (!($::ful_dbh->do( "set show_matches 'EXTERNAL_COLUMN'"))) {
     print "FAILED: Cannot customize Fulcrum show_matches ($DBI::errstr)\n";
     exit 1;
 }
@@ -92,21 +93,39 @@ if (!($::ful_dbh->do( "set character_set 'ISO_LATIN1'"))) {
 
 print "ok\n";
 
+print "Removing existing rows... ";
+if (!($::ful_dbh->do( "delete from test" ))) {
+   print "FAILED: Cannot delete ($DBI::errstr)\n";
+   exit 1;
+}
+
+print "ok\n";
+
 print "Inserting a document into test table... ";
 
 @statdata = stat ('test.fte');
 my $pwd = Cwd::getcwd; # be portable Davide, be portable!
 chomp($pwd);
-$pwd =~ s/\'/\''/g; # if a quote is present in a string, we have to double it in order to escape.
+$pwd =~ s/\'/\'\'/g; # if a quote is present in a string, we have to double it in order to escape.
 
-if (!($::ful_dbh->do(
-		     "insert into test(title,filesize,ft_sfname) values ('Test document', $statdata[7], '" . $pwd . "/test.fte')"
-		    ))) {
-    print "FAILED: Cannot insert test.fte ($DBI::errstr)\n";
-    exit 1;
+my $cur;
+if (!($cur =
+      $::ful_dbh->prepare("insert into test(title,filesize,ft_sfname) values ('Pippo pippo non lo sa ma quando passa ride tutta la citta pippo pippo non lo sa pippo pippo non lo sa Pippo pippo non lo sa ma quando passa ride tutta la citta pippo pippo non lo sa pippo pippo non lo sa Pippo pippo non lo sa ma quando passa ride tutta la', $statdata[7], '" . $pwd . "/test.fte')"	))) {
+   print "FAILED: Cannot prepare insert test.fte ($DBI::errstr)\n";
+   exit 1;
+}
+
+if (!$cur->execute) {
+   print "FAILED: Cannot execute insert test.fte ($DBI::errstr)\n";
+   exit 1;
 }
 
 print "ok\n";
+
+print "Row id (\$cur->{ful_last_row_id}) for the just inserted row: $cur->{ful_last_row_id} ...";
+print "ok\n" if ($cur->{ful_last_row_id} > 0);
+   
+$cur->finish;
 
 print "Rebuilding index... ";
 if (!($::ful_dbh->do( "VALIDATE INDEX test VALIDATE TABLE"))) {
@@ -114,10 +133,47 @@ if (!($::ful_dbh->do( "VALIDATE INDEX test VALIDATE TABLE"))) {
 }
 
 print "ok\n";
-print "Now reading the text back (open)... ";
+#print "Regenerating test file... ";
+#open INHDL, "<test.fte" && do {  # open for writing...
+#   open TESTHDL, ">$pwd/test.fte" || die "Cannot write in $pwd! ($!)\n";
+#   while (<INHDL>) { print TESTHDL $_;   }
+#   close INHDL;
+#   close TESTHDL;
+#};
+#print "ok\n";
 
-my $cursor = $::ful_dbh->prepare ('select ft_text,ft_sfname,filesize from test');
 
+print "Doing a query (expecting 'Data truncated' error)... ";
+#$::ful_dbh->{LongTruncOk} = 0;
+
+#my $cursor = $::ful_dbh->prepare ('select ft_text,ft_sfname,filesize,title from test where title contains \'pippo\'', {fulcrum_MaximumHitsInInternalColumns => 100});
+my $cursor = $::ful_dbh->prepare ('select ft_text,ft_sfname,filesize,title from test where title contains \'pippo\'');
+if ($cursor) {
+   print "(execute) ... ";
+   $cursor->execute;
+   print "ok, now fetching (fetchrow): ";
+   my $text;
+   my @row;
+   my $eot;
+   my $data_truncated = 0;
+   while (@row  = $cursor->fetchrow) {
+      $data_truncated++ if ($cursor->state =~ /01004/);
+   }
+   print "checking data truncated condition... ";
+   if ($data_truncated == 0) {
+      print "FAILED: did not detect 01004 [Data truncated] condition!\n";
+      exit 1;
+   }
+   print "ok\n";
+}
+else {
+   print "FAILED: Prepare failed ($DBI::errstr)\n";
+   exit 1;
+}
+
+print "Doing another query (this time you'll see the data)... ";
+$DBD::Fulcrum::ful_maxhitsinternalcolumns = 64;
+$cursor = $::ful_dbh->prepare ('select ft_text,ft_sfname,filesize,title from test where title contains \'pippo\'');
 if ($cursor) {
    print "(execute) ... ";
    $cursor->execute;
@@ -125,11 +181,17 @@ if ($cursor) {
    my $text;
    my @row;
    my $eot;
+   my $data_truncated = 0;
    while (@row  = $cursor->fetchrow) {
+      $data_truncated++ if ($DBI::state =~ /truncated/);
       $cursor->blob_read (1, 0, 8192, \$text);
       #or (print "+++ RB NOT OK:$DBI::errstr\n");
       $text = $` if ($text =~ /\x00/);
-      print "(FILE: $row[1]) $text";
+      print "(FILE: $row[1] TITLE: '$row[3]') "; #$text removed to clean up output
+   }
+   if ($data_truncated > 0) {
+      print "FAILED: Data truncated when it shouldn't be!\n";
+      exit 1;
    }
    print "\n***\n\tok\n";
 }
@@ -138,9 +200,10 @@ else {
    exit 1;
 }
 
-print "Exiting (NEVER use disconnect, at least with this release): OK\n";
+$cursor->finish;
+$ful_dbh->disconnect;
 
-
+print "Exiting\nIf you are here, then most likely all tests were successful.\n";
 exit 0;
 # end.
 

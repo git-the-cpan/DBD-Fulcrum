@@ -1,0 +1,113 @@
+DBD::Fulcrum  --  a Fulcrum SearchServer interface for Perl 5
+
+   Copyright (c) 1996,1997  Davide Migliavacca & INFERENTIA, Milano ITALY
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+   PLEASE READ THE ENTIRE README FILE CAREFULLY !
+
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (at least 5.003, this version developed on 5.004)
+    It is very important to TEST it and INSTALL it!
+
+    Build, test and install the DBI module (at least DBI 0.71 - this version developed with 0.81).
+    It is very important to TEST it and INSTALL it!
+
+    Remember to *read* the DBI README file!
+
+    Install enough Fulcrum SearchServer software to enable DBD::Oracle to build.
+    That includes the C Software Development Kit.
+    Contact Fulcrum (http://www.fulcrum.com) for any information about their products.
+
+
+BUILDING:
+
+	perl Makefile.PL
+	make
+
+If it's builds without error you can then run the tests. For the
+main test to work it must be able to connect to a Fulcrum SearchServer table.
+To avoid unforseeable problems with a real, production table, following these simple
+instructions to build your own brand-new use-it-once table.
+
+Copy the following files from Fulcrum SearchServer installation directories (usually $ENV{'FULCRUM_HOME'}/fultext)
+to your new directory (you can use fultest under the DBD-Fulcrum dist,
+that's exactly what it's there for).
+	fultext.ftc
+	fultext.eft
+	ftpdf.ini (only 3.5)
+	*mess files 
+
+Set FULCRUM_HOME to your Fulcrum SearchServer installation directory (e.g. /usr/fulcrum).
+Set FULCREATE, FULSEARCH and FULTEMP to the brand-new directory (thus avoiding the risk
+of leaving files around at the end of the process).
+Create the table test using the script test.fte:
+   	execsql -0 test.fte
+
+If execsql is not found, try $FULCRUM_HOME/bin/execsql.
+
+	make test
+
+	make install (if the tests look okay)
+
+As of this release, building on DEC OSF/1 requires static linking and hand-editing of the Makefile
+midway through the build. Sorry, I haven't had enough time to clean things up yet.
+Anyway, this should be working and is being used in a number of production systems.
+
+It is frequent to have and invalid or unreasonable FULTEMP variable. Usually you'll get cryptic 
+messages about memory not being enough. Be sure FULTEMP is valid and is readable/writable to whom
+must execute the program using DBD::Fulcrum.
+
+
+IF YOU HAVE PROBLEMS:
+
+Do not hand edit the generated Makefile unless you are completely sure
+you understand the implications! Always try to make changes via the
+Makefile.PL command line and/or editing the Makefile.PL.
+
+You should not need to make any changes. If you do *please* let me
+know so that I can try to make it automatic in a later release.
+
+DBI resources:
+	DBI home page:
+	http://www.hermetica.com/DBI
+	dbi mailing lists:
+	http://www.fugue.com/dbi for subscriptions
+
+Please post details of any problems (or changes you needed to make) to
+dbi-users@fugue.com and CC them to me at Davide.Migliavacca@inferentia.it. But note...
+
+** IT IS IMPORTANT TO INCLUDE THE FOLLOWING INFORMATION:
+
+1. A complete log of a all steps of the build, e.g.:
+
+	perl Makefile.PL           (do a make realclean first)
+	make
+	make test
+	make test TEST_VERBOSE=1   (only if any of the t/* tests fail)
+
+2. Full details of which version of FUlcrum SearchServer, Perl and OS you're using.
+
+3. The output of perl -V
+
+_Always_ have the appropriate amount of fun,
+Davide.
+
+
+===============================================================================
+DBI 'home page': http://www.hermetica.com/technologia/DBI
+
+Searchable index of the dbi-users mailing list:
+http://www.coe.missouri.edu/~faq/lists/dbiusers/
+
+Fulcrum home page: http://www.fulcrum.com
+INFERENTIA home page: http://www.inferentia.it
+
+
+===============================================================================
+===============================================================================
+
+End.
